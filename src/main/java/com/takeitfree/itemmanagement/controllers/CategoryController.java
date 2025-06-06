@@ -65,6 +65,12 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getItemsByCategoryName(name));
     }
 
+    // GET /category/items/id/1
+    @GetMapping("/items/id/{id}")
+    public ResponseEntity<List<ItemDTO>> getItemsByCategoryName(@PathVariable Long id) {
+        return ResponseEntity.ok(categoryService.getItemsByCategoryId(id));
+    }
+
     private List<String> formatValidationErrors(BindingResult result) {
         return result.getFieldErrors()
                 .stream()

@@ -120,4 +120,19 @@ public class CategoryServiceImpl implements CategoryService {
             throw new EntityNotFoundException(e.getMessage());
         }
     }
+
+    @Override
+    public List<ItemDTO> getItemsByCategoryId(Long id) {
+        try {
+            objectValidator.validate(id);
+            Optional<Category> optionalCategory = categoryRepository.findById(id);
+            if (optionalCategory.isEmpty()) {
+                throw new EntityNotFoundException("Category doesn't exists");
+            }
+
+            return ItemDTO.toDTO(optionalCategory.get().getItemList());
+        } catch (EntityNotFoundException e) {
+            throw new EntityNotFoundException(e.getMessage());
+        }
+    }
 }

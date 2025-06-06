@@ -14,4 +14,6 @@ public interface StatusService {
     String deleteStatus(Long id);
 
     List<ItemDTO> getItemsByStatusName(String name);
+
+    List<ItemDTO> getItemsByStatusId(Long id);
 }
