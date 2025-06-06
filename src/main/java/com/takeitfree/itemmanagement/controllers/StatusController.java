@@ -62,6 +62,13 @@ public class StatusController {
         return ResponseEntity.ok(items);
     }
 
+    // GET /status/items/id/1
+    @GetMapping("/items/id/{id}")
+    public ResponseEntity<List<ItemDTO>> getItemsByStatusId(@PathVariable Long id) {
+        List<ItemDTO> items = statusService.getItemsByStatusId(id);
+        return ResponseEntity.ok(items);
+    }
+
     private List<String> formatValidationErrors(BindingResult result) {
         return result.getFieldErrors()
                 .stream()

@@ -121,4 +121,21 @@ public class StatusServiceImpl implements StatusService {
             throw new EntityNotFoundException(e.getMessage());
         }
     }
+
+    @Override
+    public List<ItemDTO> getItemsByStatusId(Long id) {
+        try {
+            objectValidator.validate(id);
+
+            Optional<Status> statusOptional = statusRepository.findById(id);
+
+            if (statusOptional.isEmpty()) {
+                throw new EntityNotFoundException("Status doesn't exists");
+            }
+
+            return ItemDTO.toDTO(statusOptional.get().getItemList());
+        } catch (EntityNotFoundException e) {
+            throw new EntityNotFoundException(e.getMessage());
+        }
+    }
 }
