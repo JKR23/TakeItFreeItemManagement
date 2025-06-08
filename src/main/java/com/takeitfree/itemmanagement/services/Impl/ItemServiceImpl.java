@@ -1,8 +1,10 @@
 package com.takeitfree.itemmanagement.services.Impl;
 
 import com.takeitfree.itemmanagement.dto.*;
+import com.takeitfree.itemmanagement.models.GeocodingResult;
 import com.takeitfree.itemmanagement.models.Item;
 import com.takeitfree.itemmanagement.repositories.ItemRepository;
+import com.takeitfree.itemmanagement.services.GeocodingService;
 import com.takeitfree.itemmanagement.services.ItemService;
 import com.takeitfree.itemmanagement.validators.ObjectValidator;
 import jakarta.persistence.EntityExistsException;
@@ -19,71 +21,92 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
     private final ObjectValidator objectValidator;
+    private final GeocodingService geocodingService;
 
     @Override
-    public String addItem(ItemDTO itemDTO) {
+    public String addItem(ItemRequestDTO itemRequestDTO) {
 
-        objectValidator.validate(itemDTO);
+        objectValidator.validate(itemRequestDTO);
 
-        itemRepository.save(ItemDTO.toEntity(itemDTO));
+        if (itemRequestDTO.getPostalCode()!=null && !itemRequestDTO.getPostalCode().isEmpty()) {
+
+            GeocodingResult geocodingResult = geocodingService.geocodePostalCode(itemRequestDTO.getPostalCode());
+
+            itemRequestDTO.setLatitude(geocodingResult.getLatitude());
+            itemRequestDTO.setLongitude(geocodingResult.getLongitude());
+            itemRequestDTO.setCity(geocodingResult.getCity());
+
+        }
+
+        Item newItem = ItemRequestDTO.toEntity(itemRequestDTO);
+
+        newItem.setTaken(false);
+
+        itemRepository.save(newItem);
 
         return "Item added successfully";
     }
 
     @Override
-    public List<ItemDTO> getAllItems() {
-        return ItemDTO.toDTO(itemRepository.findAll());
+    public List<ItemRequestDTO> getAllItems() {
+        return ItemRequestDTO.toDTO(itemRepository.findAll());
     }
 
     @Override
-    public List<ItemDTO> getItemsByTitle(String title) {
+    public List<ItemRequestDTO> getItemsByTitle(String title) {
         objectValidator.validate(title);
-        return ItemDTO.toDTO(itemRepository.findByTitleContainingIgnoreCase(title));
+        return ItemRequestDTO.toDTO(itemRepository.findByTitleContainingIgnoreCase(title));
     }
 
     @Override
-    public List<ItemDTO> getItemsByLocalization(String localization) {
+    public List<ItemRequestDTO> getItemsByLocalization(String localization) {
         objectValidator.validate(localization);
-        return ItemDTO.toDTO(itemRepository.findByLocalization(localization));
+        return ItemRequestDTO.toDTO(itemRepository.findByLocalization(localization));
     }
 
     @Override
-    public List<ItemDTO> getItemsByDistance(Float distance) {
+    public List<ItemRequestDTO> getItemsByDistance(Float distance) {
         objectValidator.validate(distance);
-        return ItemDTO.toDTO(itemRepository.findByDistance(distance));
+        return ItemRequestDTO.toDTO(itemRepository.findByDistance(distance));
     }
 
     @Override
-    public List<ItemDTO> getItemsByTaken(boolean taken) {
+    public List<ItemRequestDTO> getItemsByTaken(boolean taken) {
         objectValidator.validate(taken);
-        return ItemDTO.toDTO(itemRepository.findByTaken(taken));
+        return ItemRequestDTO.toDTO(itemRepository.findByTaken(taken));
     }
 
     @Override
-    public String updateItem(ItemDTO itemDTO) {
+    public String updateItem(ItemRequestDTO itemRequestDTO) {
         try {
-            objectValidator.validate(itemDTO);
+            objectValidator.validate(itemRequestDTO);
 
-            Optional<Item> item = itemRepository.findById(itemDTO.getId());
+            Optional<Item> itemOptional = itemRepository.findById(itemRequestDTO.getId());
 
-            if (item.isEmpty()) {
+            if (itemOptional.isEmpty()) {
                 throw new EntityNotFoundException("Item not found");
             }
 
-            item.get().setTitle(itemDTO.getTitle());
-            item.get().setImage(itemDTO.getImage());
-            item.get().setCategory(CategoryDTO.toEntity(
-                    CategoryIdDTO.toDTO(itemDTO.getCategoryId()))
-            );
-            item.get().setStatus(StatusDTO.toEntity(
-                    StatusIdDTO.toDTO(itemDTO.getStatusId()))
-            );
-            item.get().setDescription(itemDTO.getDescription());
-            item.get().setLocalization(itemDTO.getLocalization());
-            item.get().setDistance(itemDTO.getDistance());
-            item.get().setTaken(itemDTO.isTaken());
+            Item item = itemOptional.get();
 
-            itemRepository.save(item.get());
+            // Si un code postal is provided, we update
+            if (itemRequestDTO.getPostalCode() != null && !itemRequestDTO.getPostalCode().isEmpty()) {
+                GeocodingResult geocodingResult = geocodingService.geocodePostalCode(itemRequestDTO.getPostalCode());
+                itemRequestDTO.setLatitude(geocodingResult.getLatitude());
+                itemRequestDTO.setLongitude(geocodingResult.getLongitude());
+                itemRequestDTO.setCity(geocodingResult.getCity());
+            }
+
+            // Mise à jour des champs
+            item.setTitle(itemRequestDTO.getTitle());
+            item.setImage(itemRequestDTO.getImage());
+            item.setCategory(CategoryDTO.toEntity(CategoryIdDTO.toDTO(itemRequestDTO.getCategoryId())));
+            item.setStatus(StatusDTO.toEntity(StatusIdDTO.toDTO(itemRequestDTO.getStatusId())));
+            item.setLatitude(itemRequestDTO.getLatitude());
+            item.setLongitude(itemRequestDTO.getLongitude());
+            item.setCity(itemRequestDTO.getCity());
+
+            itemRepository.save(item);
 
             return "Item updated successfully";
         } catch (EntityExistsException e) {

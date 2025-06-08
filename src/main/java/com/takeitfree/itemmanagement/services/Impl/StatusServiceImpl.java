@@ -1,6 +1,6 @@
 package com.takeitfree.itemmanagement.services.Impl;
 
-import com.takeitfree.itemmanagement.dto.ItemDTO;
+import com.takeitfree.itemmanagement.dto.ItemRequestDTO;
 import com.takeitfree.itemmanagement.dto.StatusDTO;
 import com.takeitfree.itemmanagement.models.Status;
 import com.takeitfree.itemmanagement.repositories.StatusRepository;
@@ -105,7 +105,7 @@ public class StatusServiceImpl implements StatusService {
     }
 
     @Override
-    public List<ItemDTO> getItemsByStatusName(String name) {
+    public List<ItemRequestDTO> getItemsByStatusName(String name) {
 
         try {
             objectValidator.validate(name);
@@ -116,14 +116,14 @@ public class StatusServiceImpl implements StatusService {
                 throw new EntityNotFoundException("Status doesn't exists");
             }
 
-            return ItemDTO.toDTO(statusOptional.get().getItemList());
+            return ItemRequestDTO.toDTO(statusOptional.get().getItemList());
         } catch (EntityNotFoundException e) {
             throw new EntityNotFoundException(e.getMessage());
         }
     }
 
     @Override
-    public List<ItemDTO> getItemsByStatusId(Long id) {
+    public List<ItemRequestDTO> getItemsByStatusId(Long id) {
         try {
             objectValidator.validate(id);
 
@@ -133,7 +133,7 @@ public class StatusServiceImpl implements StatusService {
                 throw new EntityNotFoundException("Status doesn't exists");
             }
 
-            return ItemDTO.toDTO(statusOptional.get().getItemList());
+            return ItemRequestDTO.toDTO(statusOptional.get().getItemList());
         } catch (EntityNotFoundException e) {
             throw new EntityNotFoundException(e.getMessage());
         }

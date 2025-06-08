@@ -1,10 +1,9 @@
 package com.takeitfree.itemmanagement.services;
 
-import com.takeitfree.itemmanagement.dto.ItemDTO;
+import com.takeitfree.itemmanagement.dto.ItemRequestDTO;
 import com.takeitfree.itemmanagement.dto.StatusDTO;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface StatusService {
     List<StatusDTO> getAllStatus();
@@ -13,7 +12,7 @@ public interface StatusService {
     String updateStatus(StatusDTO status);
     String deleteStatus(Long id);
 
-    List<ItemDTO> getItemsByStatusName(String name);
+    List<ItemRequestDTO> getItemsByStatusName(String name);
 
-    List<ItemDTO> getItemsByStatusId(Long id);
+    List<ItemRequestDTO> getItemsByStatusId(Long id);
 }

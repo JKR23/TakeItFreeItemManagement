@@ -1,6 +1,6 @@
 package com.takeitfree.itemmanagement.controllers;
 
-import com.takeitfree.itemmanagement.dto.ItemDTO;
+import com.takeitfree.itemmanagement.dto.ItemRequestDTO;
 import com.takeitfree.itemmanagement.services.ItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,44 +19,44 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping("/add")
-    public ResponseEntity<?> addItem(@RequestBody @Valid ItemDTO itemDTO, BindingResult result) {
+    public ResponseEntity<?> addItem(@RequestBody @Valid ItemRequestDTO itemRequestDTO, BindingResult result) {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(formatValidationErrors(result));
         }
-        return ResponseEntity.ok(itemService.addItem(itemDTO));
+        return ResponseEntity.ok(itemService.addItem(itemRequestDTO));
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<ItemDTO>> getAllItems() {
+    public ResponseEntity<List<ItemRequestDTO>> getAllItems() {
         return ResponseEntity.ok(itemService.getAllItems());
     }
 
     @GetMapping("/by-title")
-    public ResponseEntity<List<ItemDTO>> getItemsByTitle(@RequestParam String title) {
+    public ResponseEntity<List<ItemRequestDTO>> getItemsByTitle(@RequestParam String title) {
         return ResponseEntity.ok(itemService.getItemsByTitle(title));
     }
 
     @GetMapping("/by-localization")
-    public ResponseEntity<List<ItemDTO>> getItemsByLocalization(@RequestParam String localization) {
+    public ResponseEntity<List<ItemRequestDTO>> getItemsByLocalization(@RequestParam String localization) {
         return ResponseEntity.ok(itemService.getItemsByLocalization(localization));
     }
 
     @GetMapping("/by-distance")
-    public ResponseEntity<List<ItemDTO>> getItemsByDistance(@RequestParam Float distance) {
+    public ResponseEntity<List<ItemRequestDTO>> getItemsByDistance(@RequestParam Float distance) {
         return ResponseEntity.ok(itemService.getItemsByDistance(distance));
     }
 
     @GetMapping("/by-taken")
-    public ResponseEntity<List<ItemDTO>> getItemsByTaken(@RequestParam boolean taken) {
+    public ResponseEntity<List<ItemRequestDTO>> getItemsByTaken(@RequestParam boolean taken) {
         return ResponseEntity.ok(itemService.getItemsByTaken(taken));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateItem(@RequestBody @Valid ItemDTO itemDTO, BindingResult result) {
+    public ResponseEntity<?> updateItem(@RequestBody @Valid ItemRequestDTO itemRequestDTO, BindingResult result) {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(formatValidationErrors(result));
         }
-        return ResponseEntity.ok(itemService.updateItem(itemDTO));
+        return ResponseEntity.ok(itemService.updateItem(itemRequestDTO));
     }
 
     @DeleteMapping("/delete/{id}")

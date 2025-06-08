@@ -1,6 +1,6 @@
 package com.takeitfree.itemmanagement.controllers;
 
-import com.takeitfree.itemmanagement.dto.ItemDTO;
+import com.takeitfree.itemmanagement.dto.ItemRequestDTO;
 import com.takeitfree.itemmanagement.dto.StatusDTO;
 import com.takeitfree.itemmanagement.services.StatusService;
 import jakarta.validation.Valid;
@@ -57,15 +57,15 @@ public class StatusController {
 
     // GET /status/items?name=Active
     @GetMapping("/items")
-    public ResponseEntity<List<ItemDTO>> getItemsByStatusName(@RequestParam String name) {
-        List<ItemDTO> items = statusService.getItemsByStatusName(name);
+    public ResponseEntity<List<ItemRequestDTO>> getItemsByStatusName(@RequestParam String name) {
+        List<ItemRequestDTO> items = statusService.getItemsByStatusName(name);
         return ResponseEntity.ok(items);
     }
 
     // GET /status/items/id/1
     @GetMapping("/items/id/{id}")
-    public ResponseEntity<List<ItemDTO>> getItemsByStatusId(@PathVariable Long id) {
-        List<ItemDTO> items = statusService.getItemsByStatusId(id);
+    public ResponseEntity<List<ItemRequestDTO>> getItemsByStatusId(@PathVariable Long id) {
+        List<ItemRequestDTO> items = statusService.getItemsByStatusId(id);
         return ResponseEntity.ok(items);
     }
 
