@@ -25,9 +25,6 @@ public class ItemRequestDTO implements Serializable {
     @Size(max = 300, message = "image path too long")
     private String image;
 
-    @NotNull(message = "Category is required")
-    private CategoryIdDTO categoryId;
-
     @NotNull(message = "Status is required")
     private StatusIdDTO statusId;
 
@@ -50,9 +47,6 @@ public class ItemRequestDTO implements Serializable {
                 .id(item.getId())
                 .title(item.getTitle())
                 .image(item.getImage())
-                .categoryId(CategoryIdDTO.toIdDTO(
-                        CategoryDTO.toDTO(item.getCategory())
-                ))
                 .statusId(StatusIdDTO.toIdDTO(
                         StatusDTO.toDTO(item.getStatus())
                 ))
@@ -68,9 +62,6 @@ public class ItemRequestDTO implements Serializable {
                 .id(item.getId())
                 .title(item.getTitle())
                 .image(item.getImage())
-                .category(CategoryDTO.toEntity(
-                        CategoryIdDTO.toDTO(item.categoryId) //entity<-dto<--idDTO
-                ))
                 .status(StatusDTO.toEntity(
                         StatusIdDTO.toDTO(item.statusId)
                 ))

@@ -1,5 +1,6 @@
 package com.takeitfree.itemmanagement.controllers;
 
+import com.takeitfree.itemmanagement.dto.ItemPublicDTO;
 import com.takeitfree.itemmanagement.dto.ItemRequestDTO;
 import com.takeitfree.itemmanagement.dto.StatusDTO;
 import com.takeitfree.itemmanagement.services.StatusService;
@@ -67,6 +68,12 @@ public class StatusController {
     public ResponseEntity<List<ItemRequestDTO>> getItemsByStatusId(@PathVariable Long id) {
         List<ItemRequestDTO> items = statusService.getItemsByStatusId(id);
         return ResponseEntity.ok(items);
+    }
+
+    // GET /status/items-all
+    @GetMapping("/items-all")
+    public ResponseEntity<List<ItemPublicDTO>> getAllStatusItemsNotTaken() {
+        return ResponseEntity.ok(statusService.getAllStatusItems());
     }
 
     private List<String> formatValidationErrors(BindingResult result) {

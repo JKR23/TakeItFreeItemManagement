@@ -27,10 +27,6 @@ public class Item implements Serializable {
     @Size(max = 300, message = "image path too long")
     private String image; //not string but MultipartFile
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private Category category;
-
     @ManyToOne
     @JoinColumn(name = "status_id")
     private Status status;

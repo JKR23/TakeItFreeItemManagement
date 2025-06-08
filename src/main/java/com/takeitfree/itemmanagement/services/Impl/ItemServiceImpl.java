@@ -100,7 +100,6 @@ public class ItemServiceImpl implements ItemService {
             // Mise à jour des champs
             item.setTitle(itemRequestDTO.getTitle());
             item.setImage(itemRequestDTO.getImage());
-            item.setCategory(CategoryDTO.toEntity(CategoryIdDTO.toDTO(itemRequestDTO.getCategoryId())));
             item.setStatus(StatusDTO.toEntity(StatusIdDTO.toDTO(itemRequestDTO.getStatusId())));
             item.setLatitude(itemRequestDTO.getLatitude());
             item.setLongitude(itemRequestDTO.getLongitude());
