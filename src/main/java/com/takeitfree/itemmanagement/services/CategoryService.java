@@ -1,10 +1,10 @@
 package com.takeitfree.itemmanagement.services;
 
 import com.takeitfree.itemmanagement.dto.CategoryDTO;
-import com.takeitfree.itemmanagement.dto.ItemDTO;
+import com.takeitfree.itemmanagement.dto.ItemPublicDTO;
+import com.takeitfree.itemmanagement.dto.ItemRequestDTO;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface CategoryService {
     List<CategoryDTO> getAllCategory();
@@ -13,7 +13,8 @@ public interface CategoryService {
     String updateCategory(CategoryDTO categoryDTO);
     String deleteCategory(Long id);
 
-    List<ItemDTO> getItemsByCategoryName(String name);
+    List<ItemPublicDTO> getItemsByCategoryName(String name);
 
-    List<ItemDTO> getItemsByCategoryId(Long id);
+    List<ItemPublicDTO> getItemsByCategoryId(Long id);
+    List<ItemPublicDTO> getAllCategoryItems();
 }

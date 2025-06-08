@@ -1,7 +1,8 @@
 package com.takeitfree.itemmanagement.controllers;
 
 import com.takeitfree.itemmanagement.dto.CategoryDTO;
-import com.takeitfree.itemmanagement.dto.ItemDTO;
+import com.takeitfree.itemmanagement.dto.ItemPublicDTO;
+import com.takeitfree.itemmanagement.dto.ItemRequestDTO;
 import com.takeitfree.itemmanagement.services.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -61,14 +62,20 @@ public class CategoryController {
 
     // GET /category/items?name=X
     @GetMapping("/items")
-    public ResponseEntity<List<ItemDTO>> getItemsByCategoryName(@RequestParam String name) {
+    public ResponseEntity<List<ItemPublicDTO>> getItemsByCategoryName(@RequestParam String name) {
         return ResponseEntity.ok(categoryService.getItemsByCategoryName(name));
     }
 
     // GET /category/items/id/1
     @GetMapping("/items/id/{id}")
-    public ResponseEntity<List<ItemDTO>> getItemsByCategoryName(@PathVariable Long id) {
+    public ResponseEntity<List<ItemPublicDTO>> getItemsByCategoryName(@PathVariable Long id) {
         return ResponseEntity.ok(categoryService.getItemsByCategoryId(id));
+    }
+
+    // GET /category/items/id/1
+    @GetMapping("/items-all")
+    public ResponseEntity<List<ItemPublicDTO>> getItemsByCategoryName() {
+        return ResponseEntity.ok(categoryService.getAllCategoryItems());
     }
 
     private List<String> formatValidationErrors(BindingResult result) {

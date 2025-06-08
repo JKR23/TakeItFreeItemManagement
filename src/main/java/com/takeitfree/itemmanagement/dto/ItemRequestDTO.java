@@ -1,14 +1,10 @@
 package com.takeitfree.itemmanagement.dto;
 
 import com.takeitfree.itemmanagement.models.Item;
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.List;
@@ -18,7 +14,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class ItemDTO implements Serializable {
+public class ItemRequestDTO implements Serializable {
     private Long id;
 
     @NotBlank(message = "Title is required")
@@ -26,6 +22,7 @@ public class ItemDTO implements Serializable {
     private String title;
 
     @NotBlank(message = "Image is required")
+    @Size(max = 300, message = "image path too long")
     private String image;
 
     @NotNull(message = "Category is required")
@@ -34,21 +31,22 @@ public class ItemDTO implements Serializable {
     @NotNull(message = "Status is required")
     private StatusIdDTO statusId;
 
-    @NotBlank(message = "Description is required")
-    @Size(min = 10, max = 1000, message = "Description must be between 10 and 1000 characters")
-    private String description;
+    @NotBlank(message = "postalCode is required")
+    @Size(min = 7, max = 7, message = "invalid postal code")
+    private String postalCode;
 
-    @NotBlank(message = "Localization is required")
-    private String localization;
+    @Setter
+    private Double latitude;
 
-    @DecimalMin(value = "0.0", message = "Distance must be a positive number")
-    private Float distance;
+    @Setter
+    private Double longitude;
 
-    private boolean taken;
+    @Setter
+    @Size(max = 25, message = "city too long")
+    private String city;
 
-
-    public static ItemDTO toDTO(Item item) {
-        return ItemDTO.builder()
+    public static ItemRequestDTO toDTO(Item item) {
+        return ItemRequestDTO.builder()
                 .id(item.getId())
                 .title(item.getTitle())
                 .image(item.getImage())
@@ -58,14 +56,14 @@ public class ItemDTO implements Serializable {
                 .statusId(StatusIdDTO.toIdDTO(
                         StatusDTO.toDTO(item.getStatus())
                 ))
-                .description(item.getDescription())
-                .localization(item.getLocalization())
-                .distance(item.getDistance())
-                .taken(item.isTaken())
+                .postalCode(item.getPostalCode())
+                .latitude(item.getLatitude())
+                .longitude(item.getLongitude())
+                .city(item.getCity())
                 .build();
     }
 
-    public static Item toEntity(ItemDTO item) {
+    public static Item toEntity(ItemRequestDTO item) {
         return Item.builder()
                 .id(item.getId())
                 .title(item.getTitle())
@@ -76,18 +74,18 @@ public class ItemDTO implements Serializable {
                 .status(StatusDTO.toEntity(
                         StatusIdDTO.toDTO(item.statusId)
                 ))
-                .description(item.getDescription())
-                .localization(item.getLocalization())
-                .distance(item.getDistance())
-                .taken(item.isTaken())
+                .postalCode(item.getPostalCode())
+                .longitude(item.getLongitude())
+                .latitude(item.getLatitude())
+                .city(item.getCity())
                 .build();
     }
 
-    public static List<ItemDTO> toDTO(List<Item> items) {
-        return items.stream().map(ItemDTO::toDTO).collect(Collectors.toList());
+    public static List<ItemRequestDTO> toDTO(List<Item> items) {
+        return items.stream().map(ItemRequestDTO::toDTO).collect(Collectors.toList());
     }
 
-    public static List<Item> toEntity(List<ItemDTO> items) {
-        return items.stream().map(ItemDTO::toEntity).collect(Collectors.toList());
+    public static List<Item> toEntity(List<ItemRequestDTO> items) {
+        return items.stream().map(ItemRequestDTO::toEntity).collect(Collectors.toList());
     }
 }

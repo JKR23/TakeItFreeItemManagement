@@ -1,7 +1,8 @@
 package com.takeitfree.itemmanagement.services.Impl;
 
 import com.takeitfree.itemmanagement.dto.CategoryDTO;
-import com.takeitfree.itemmanagement.dto.ItemDTO;
+import com.takeitfree.itemmanagement.dto.ItemPublicDTO;
+import com.takeitfree.itemmanagement.dto.ItemRequestDTO;
 import com.takeitfree.itemmanagement.models.Category;
 import com.takeitfree.itemmanagement.repositories.CategoryRepository;
 import com.takeitfree.itemmanagement.services.CategoryService;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -105,7 +107,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<ItemDTO> getItemsByCategoryName(String name) {
+    public List<ItemPublicDTO> getItemsByCategoryName(String name) {
         try {
             objectValidator.validate(name);
 
@@ -115,14 +117,14 @@ public class CategoryServiceImpl implements CategoryService {
                 throw new EntityNotFoundException("Category doesn't exists");
             }
 
-            return ItemDTO.toDTO(optionalCategory.get().getItemList());
+            return ItemPublicDTO.toDTO(optionalCategory.get().getItemList());
         } catch (EntityNotFoundException e) {
             throw new EntityNotFoundException(e.getMessage());
         }
     }
 
     @Override
-    public List<ItemDTO> getItemsByCategoryId(Long id) {
+    public List<ItemPublicDTO> getItemsByCategoryId(Long id) {
         try {
             objectValidator.validate(id);
             Optional<Category> optionalCategory = categoryRepository.findById(id);
@@ -130,9 +132,22 @@ public class CategoryServiceImpl implements CategoryService {
                 throw new EntityNotFoundException("Category doesn't exists");
             }
 
-            return ItemDTO.toDTO(optionalCategory.get().getItemList());
+            return ItemPublicDTO.toDTO(optionalCategory.get().getItemList());
         } catch (EntityNotFoundException e) {
             throw new EntityNotFoundException(e.getMessage());
         }
+    }
+
+    @Override
+    public List<ItemPublicDTO> getAllCategoryItems() {
+
+        List<Category> categories = categoryRepository.findAll();
+
+        return categories.stream()
+                .flatMap(category -> category.getItemList().stream()) //turn that into a single stream of all category's items.
+                .filter(item -> !item.isTaken()) // filter only isTaken is false
+                .map(ItemPublicDTO::toDTO)
+                .collect(Collectors.toList());
+
     }
 }

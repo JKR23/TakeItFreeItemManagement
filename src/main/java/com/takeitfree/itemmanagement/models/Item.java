@@ -24,7 +24,8 @@ public class Item implements Serializable {
     private String title;
 
     @NotBlank(message = "Image is required")
-    private String image;
+    @Size(max = 300, message = "image path too long")
+    private String image; //not string but MultipartFile
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
@@ -34,15 +35,16 @@ public class Item implements Serializable {
     @JoinColumn(name = "status_id")
     private Status status;
 
-    @NotBlank(message = "Description is required")
-    @Size(min = 10, max = 1000, message = "Description must be between 10 and 1000 characters")
-    private String description;
+    @NotBlank(message = "postalCode is required")
+    @Size(min = 7, max = 7, message = "invalid postal code")
+    private String postalCode;
 
-    @NotBlank(message = "Localization is required")
-    private String localization;
+    private Double latitude;
 
-    @DecimalMin(value = "0.0", message = "Distance must be a positive number")
-    private Float distance;
+    private Double longitude;
+
+    @Size(max = 25, message = "city too long")
+    private String city;
 
     private boolean taken;
 

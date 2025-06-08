@@ -1,24 +1,24 @@
 package com.takeitfree.itemmanagement.services;
 
-import com.takeitfree.itemmanagement.dto.ItemDTO;
+import com.takeitfree.itemmanagement.dto.ItemRequestDTO;
 
 import java.util.List;
 
 public interface ItemService {
 
-    String addItem(ItemDTO itemDTO);
+    String addItem(ItemRequestDTO itemRequestDTO);
 
-    List<ItemDTO> getAllItems();
+    List<ItemRequestDTO> getAllItems();
 
-    List<ItemDTO> getItemsByTitle(String title);
+    List<ItemRequestDTO> getItemsByTitle(String title);
 
-    List<ItemDTO> getItemsByLocalization(String localization);
+    List<ItemRequestDTO> getItemsByLocalization(String localization);
 
-    List<ItemDTO> getItemsByDistance(Float distance);
+    List<ItemRequestDTO> getItemsByDistance(Float distance);
 
-    List<ItemDTO> getItemsByTaken(boolean taken);
+    List<ItemRequestDTO> getItemsByTaken(boolean taken);
 
-    String updateItem(ItemDTO itemDTO);
+    String updateItem(ItemRequestDTO itemRequestDTO);
 
     String deleteItem(Long id);
 
