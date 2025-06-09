@@ -1,56 +1,66 @@
 package com.takeitfree.itemmanagement.services.Impl;
 
-import com.takeitfree.itemmanagement.models.GeocodingResult;
+import com.takeitfree.itemmanagement.dto.GeoLocationIQResponse;
+import com.takeitfree.itemmanagement.dto.LocationData;
 import com.takeitfree.itemmanagement.services.GeocodingService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class GeocodingServiceImpl implements GeocodingService {
 
-    @Value("${google.api.key}")
-    private String googleApiKey;
+    @Value("${locationiq.api.key}")
+    private String locationIqApiKey;
+
+    private final RestTemplate restTemplate = new RestTemplate();
 
     @Override
-    public GeocodingResult geocodePostalCode(String postalCode) {
-        String url = UriComponentsBuilder.newInstance()
-                .scheme("https")
-                .host("maps.googleapis.com")
-                .path("/maps/api/geocode/json")
-                .queryParam("address", postalCode)
-                .queryParam("region", "ca")
-                .queryParam("key", googleApiKey)
-                .build()
-                .toUriString();
-
-        RestTemplate restTemplate = new RestTemplate();
-        String response = restTemplate.getForObject(url, String.class);
-        JSONObject json = new JSONObject(response);
-
-        JSONArray results = json.getJSONArray("results");
-        if (results.isEmpty()) throw new RuntimeException("Code postal introuvable");
-
-        JSONObject location = results.getJSONObject(0)
-                .getJSONObject("geometry")
-                .getJSONObject("location");
-
-        String city = "";
-        JSONArray components = results.getJSONObject(0).getJSONArray("address_components");
-        for (int i = 0; i < components.length(); i++) {
-            JSONObject comp = components.getJSONObject(i);
-            JSONArray types = comp.getJSONArray("types");
-            for (int j = 0; j < types.length(); j++) {
-                if ("locality".equals(types.getString(j))) {
-                    city = comp.getString("long_name");
-                    break;
-                }
-            }
+    public LocationData getLocationFromPostalCode(String postalCode) {
+        if (postalCode == null || postalCode.trim().isEmpty()) {
+            throw new RuntimeException("postal code is null or empty");
         }
 
-        return new GeocodingResult(location.getDouble("lat"), location.getDouble("lng"), city);
+        URI uri = UriComponentsBuilder.newInstance()
+                .scheme("https")
+                .host("us1.locationiq.com")
+                .path("/v1/search")
+                .queryParam("key", locationIqApiKey)
+                .queryParam("q", URLEncoder.encode(postalCode.trim(), StandardCharsets.UTF_8))
+                .queryParam("format", "json")
+                .queryParam("addressdetails", "1")
+                .build()
+                .toUri();
+
+        GeoLocationIQResponse[] results = restTemplate.getForObject(uri, GeoLocationIQResponse[].class);
+
+        if (results == null || results.length == 0) {
+            throw new RuntimeException("none result found the postal code");
+        }
+
+        GeoLocationIQResponse firstResult = results[0];
+
+        if (firstResult.getLatitude() == null || firstResult.getLongitude() == null) {
+            throw new RuntimeException("Latitude or longitude missing");
+        }
+
+        String city = null;
+        if (firstResult.getAddress() != null) {
+            city = firstResult.getAddress().getCity();
+            if (city == null) city = firstResult.getAddress().getTown();
+            if (city == null) city = firstResult.getAddress().getVillage();
+        }
+
+        return LocationData.builder()
+                .latitude(Double.parseDouble(firstResult.getLatitude()))
+                .longitude(Double.parseDouble(firstResult.getLongitude()))
+                .city(city != null ? city : "Unknown city")
+                .build();
     }
+
 }

@@ -1,17 +1,15 @@
-package com.takeitfree.itemmanagement.models;
+package com.takeitfree.itemmanagement.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
 import java.io.Serializable;
 
-@Data
 @Builder
+@Getter
 @AllArgsConstructor
-@NoArgsConstructor
-public class GeocodingResult implements Serializable {
+public class LocationData implements Serializable {
     private double latitude;
     private double longitude;
     private String city;

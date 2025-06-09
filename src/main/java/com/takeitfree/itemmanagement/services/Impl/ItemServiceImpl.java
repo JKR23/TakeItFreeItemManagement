@@ -1,7 +1,7 @@
 package com.takeitfree.itemmanagement.services.Impl;
 
 import com.takeitfree.itemmanagement.dto.*;
-import com.takeitfree.itemmanagement.models.GeocodingResult;
+import com.takeitfree.itemmanagement.dto.GeoLocationIQResponse;
 import com.takeitfree.itemmanagement.models.Item;
 import com.takeitfree.itemmanagement.repositories.ItemRepository;
 import com.takeitfree.itemmanagement.services.GeocodingService;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,25 +27,30 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public String addItem(ItemRequestDTO itemRequestDTO) {
 
-        objectValidator.validate(itemRequestDTO);
+        try {
+            objectValidator.validate(itemRequestDTO);
 
-        if (itemRequestDTO.getPostalCode()!=null && !itemRequestDTO.getPostalCode().isEmpty()) {
+            if (itemRequestDTO.getPostalCode() == null || itemRequestDTO.getPostalCode().isEmpty()) {
+                throw new RuntimeException("Postal code is required");
+            }
 
-            GeocodingResult geocodingResult = geocodingService.geocodePostalCode(itemRequestDTO.getPostalCode());
+            LocationData locationData = geocodingService.getLocationFromPostalCode(itemRequestDTO.getPostalCode());
 
-            itemRequestDTO.setLatitude(geocodingResult.getLatitude());
-            itemRequestDTO.setLongitude(geocodingResult.getLongitude());
-            itemRequestDTO.setCity(geocodingResult.getCity());
+            itemRequestDTO.setLatitude(locationData.getLatitude());
+            itemRequestDTO.setLongitude(locationData.getLongitude());
+            itemRequestDTO.setCity(locationData.getCity());
 
+            Item newItem = ItemRequestDTO.toEntity(itemRequestDTO);
+
+            newItem.setTaken(false);
+
+            itemRepository.save(newItem);
+
+            return "Item added successfully";
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
         }
 
-        Item newItem = ItemRequestDTO.toEntity(itemRequestDTO);
-
-        newItem.setTaken(false);
-
-        itemRepository.save(newItem);
-
-        return "Item added successfully";
     }
 
     @Override
@@ -59,15 +65,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemRequestDTO> getItemsByLocalization(String localization) {
-        objectValidator.validate(localization);
-        return ItemRequestDTO.toDTO(itemRepository.findByLocalization(localization));
-    }
-
-    @Override
-    public List<ItemRequestDTO> getItemsByDistance(Float distance) {
-        objectValidator.validate(distance);
-        return ItemRequestDTO.toDTO(itemRepository.findByDistance(distance));
+    public List<ItemRequestDTO> getItemsByPostalCode(String postalCode) {
+        objectValidator.validate(postalCode);
+        return ItemRequestDTO.toDTO(itemRepository.findByPostalCode(postalCode));
     }
 
     @Override
@@ -87,20 +87,21 @@ public class ItemServiceImpl implements ItemService {
                 throw new EntityNotFoundException("Item not found");
             }
 
-            Item item = itemOptional.get();
-
             // Si un code postal is provided, we update
-            if (itemRequestDTO.getPostalCode() != null && !itemRequestDTO.getPostalCode().isEmpty()) {
-                GeocodingResult geocodingResult = geocodingService.geocodePostalCode(itemRequestDTO.getPostalCode());
-                itemRequestDTO.setLatitude(geocodingResult.getLatitude());
-                itemRequestDTO.setLongitude(geocodingResult.getLongitude());
-                itemRequestDTO.setCity(geocodingResult.getCity());
+            if (itemRequestDTO.getPostalCode() == null || itemRequestDTO.getPostalCode().isEmpty()) {
+                throw new RuntimeException("Postal code is missing");
             }
+
+            LocationData locationData = geocodingService.getLocationFromPostalCode(itemRequestDTO.getPostalCode());
+            itemRequestDTO.setLatitude(locationData.getLatitude());
+            itemRequestDTO.setLongitude(locationData.getLongitude());
+            itemRequestDTO.setCity(locationData.getCity());
+
+            Item item = itemOptional.get();
 
             // Mise à jour des champs
             item.setTitle(itemRequestDTO.getTitle());
             item.setImage(itemRequestDTO.getImage());
-            item.setCategory(CategoryDTO.toEntity(CategoryIdDTO.toDTO(itemRequestDTO.getCategoryId())));
             item.setStatus(StatusDTO.toEntity(StatusIdDTO.toDTO(itemRequestDTO.getStatusId())));
             item.setLatitude(itemRequestDTO.getLatitude());
             item.setLongitude(itemRequestDTO.getLongitude());
@@ -153,6 +154,27 @@ public class ItemServiceImpl implements ItemService {
             return item.get().isTaken();
 
         } catch (EntityNotFoundException e) {
+            throw new EntityNotFoundException(e.getMessage());
+        }
+    }
+
+    @Override
+    public List<ItemPublicDTO> getItemsByCity(String city) {
+        try{
+            objectValidator.validate(city);
+
+            List<Item> itemList = itemRepository.findByCityContainingIgnoreCase(city);
+
+            if (itemList.isEmpty()) {
+                throw new EntityNotFoundException("Item not found");
+            }
+
+            return itemList.stream()
+                    .filter(item -> !item.isTaken())
+                    .map(ItemPublicDTO::toDTO)
+                    .collect(Collectors.toList());
+
+        } catch (EntityNotFoundException e){
             throw new EntityNotFoundException(e.getMessage());
         }
     }

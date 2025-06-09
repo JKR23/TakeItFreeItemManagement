@@ -1,5 +1,6 @@
 package com.takeitfree.itemmanagement.controllers;
 
+import com.takeitfree.itemmanagement.dto.ItemPublicDTO;
 import com.takeitfree.itemmanagement.dto.ItemRequestDTO;
 import com.takeitfree.itemmanagement.services.ItemService;
 import jakarta.validation.Valid;
@@ -36,14 +37,14 @@ public class ItemController {
         return ResponseEntity.ok(itemService.getItemsByTitle(title));
     }
 
-    @GetMapping("/by-localization")
-    public ResponseEntity<List<ItemRequestDTO>> getItemsByLocalization(@RequestParam String localization) {
-        return ResponseEntity.ok(itemService.getItemsByLocalization(localization));
+    @GetMapping("/by-location")
+    public ResponseEntity<List<ItemRequestDTO>> getItemsByLocation(@RequestParam String location) {
+        return ResponseEntity.ok(itemService.getItemsByPostalCode(location));
     }
 
-    @GetMapping("/by-distance")
-    public ResponseEntity<List<ItemRequestDTO>> getItemsByDistance(@RequestParam Float distance) {
-        return ResponseEntity.ok(itemService.getItemsByDistance(distance));
+    @GetMapping("/by-city")
+    public ResponseEntity<List<ItemPublicDTO>> getItemsByCity(@RequestParam String city) {
+        return ResponseEntity.ok(itemService.getItemsByCity(city));
     }
 
     @GetMapping("/by-taken")

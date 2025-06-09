@@ -1,5 +1,6 @@
 package com.takeitfree.itemmanagement.services;
 
+import com.takeitfree.itemmanagement.dto.ItemPublicDTO;
 import com.takeitfree.itemmanagement.dto.ItemRequestDTO;
 import com.takeitfree.itemmanagement.dto.StatusDTO;
 
@@ -15,4 +16,5 @@ public interface StatusService {
     List<ItemRequestDTO> getItemsByStatusName(String name);
 
     List<ItemRequestDTO> getItemsByStatusId(Long id);
+    List<ItemPublicDTO> getAllStatusItems();
 }

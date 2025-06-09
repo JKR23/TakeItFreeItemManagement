@@ -1,5 +1,6 @@
 package com.takeitfree.itemmanagement.services;
 
+import com.takeitfree.itemmanagement.dto.ItemPublicDTO;
 import com.takeitfree.itemmanagement.dto.ItemRequestDTO;
 
 import java.util.List;
@@ -12,9 +13,7 @@ public interface ItemService {
 
     List<ItemRequestDTO> getItemsByTitle(String title);
 
-    List<ItemRequestDTO> getItemsByLocalization(String localization);
-
-    List<ItemRequestDTO> getItemsByDistance(Float distance);
+    List<ItemRequestDTO> getItemsByPostalCode(String postalCode);
 
     List<ItemRequestDTO> getItemsByTaken(boolean taken);
 
@@ -23,4 +22,6 @@ public interface ItemService {
     String deleteItem(Long id);
 
     boolean markItemAsTaken(Long id);
+
+    List<ItemPublicDTO> getItemsByCity(String city);
 }

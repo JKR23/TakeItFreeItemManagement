@@ -1,5 +1,6 @@
 package com.takeitfree.itemmanagement.services.Impl;
 
+import com.takeitfree.itemmanagement.dto.ItemPublicDTO;
 import com.takeitfree.itemmanagement.dto.ItemRequestDTO;
 import com.takeitfree.itemmanagement.dto.StatusDTO;
 import com.takeitfree.itemmanagement.models.Status;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -137,5 +139,16 @@ public class StatusServiceImpl implements StatusService {
         } catch (EntityNotFoundException e) {
             throw new EntityNotFoundException(e.getMessage());
         }
+    }
+
+    @Override
+    public List<ItemPublicDTO> getAllStatusItems() {
+        List<Status> statusList = statusRepository.findAll();
+
+        return statusList.stream()
+                .flatMap(status -> status.getItemList().stream()) //turn that into a single stream of all category's items.
+                .filter(item -> !item.isTaken()) // filter only isTaken is false
+                .map(ItemPublicDTO::toDTO)
+                .collect(Collectors.toList());
     }
 }
