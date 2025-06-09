@@ -1,7 +1,7 @@
 package com.takeitfree.itemmanagement.services;
 
-import com.takeitfree.itemmanagement.models.GeocodingResult;
+import com.takeitfree.itemmanagement.dto.LocationData;
 
 public interface GeocodingService {
-    public GeocodingResult geocodePostalCode(String postalCode);
+    public LocationData getLocationFromPostalCode(String postalCode);
 }
