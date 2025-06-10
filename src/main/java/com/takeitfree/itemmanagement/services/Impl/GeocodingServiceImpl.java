@@ -28,12 +28,13 @@ public class GeocodingServiceImpl implements GeocodingService {
 
         URI uri = UriComponentsBuilder.newInstance()
                 .scheme("https")
-                .host("us1.locationiq.com")
-                .path("/v1/search")
+                .host("api.locationiq.com")
+                .path("/v1/autocomplete.php") // extension .php requise
                 .queryParam("key", locationIqApiKey)
                 .queryParam("q", URLEncoder.encode(postalCode.trim(), StandardCharsets.UTF_8))
-                .queryParam("format", "json")
-                .queryParam("addressdetails", "1")
+                .queryParam("limit", "5")
+                .queryParam("dedupe", "1")
+                .queryParam("format", "json") // format requis
                 .build()
                 .toUri();
 

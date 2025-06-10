@@ -1,7 +1,6 @@
 package com.takeitfree.itemmanagement.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -25,7 +24,7 @@ public class Item implements Serializable {
 
     @NotBlank(message = "Image is required")
     @Size(max = 300, message = "image path too long")
-    private String image; //not string but MultipartFile
+    private String image;
 
     @ManyToOne
     @JoinColumn(name = "status_id")
@@ -39,7 +38,7 @@ public class Item implements Serializable {
 
     private Double longitude;
 
-    @Size(max = 25, message = "city too long")
+    @Size(max = 50, message = "city too long")
     private String city;
 
     private boolean taken;

@@ -33,6 +33,12 @@ public class ItemPublicDTO implements Serializable {
     private String postalCode;
 
     @Setter
+    private Double latitude;
+
+    @Setter
+    private Double longitude;
+
+    @Setter
     @Size(max = 25, message = "city too long")
     private String city;
 
@@ -45,6 +51,8 @@ public class ItemPublicDTO implements Serializable {
                         StatusDTO.toDTO(item.getStatus())
                 ))
                 .postalCode(item.getPostalCode())
+                .latitude(item.getLatitude())
+                .longitude(item.getLongitude())
                 .city(item.getCity())
                 .build();
     }
@@ -58,6 +66,8 @@ public class ItemPublicDTO implements Serializable {
                         StatusIdDTO.toDTO(item.statusId)
                 ))
                 .postalCode(item.getPostalCode())
+                .latitude(item.getLatitude())
+                .longitude(item.getLongitude())
                 .city(item.getCity())
                 .build();
     }
