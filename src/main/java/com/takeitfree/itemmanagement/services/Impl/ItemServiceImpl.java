@@ -8,7 +8,6 @@ import com.takeitfree.itemmanagement.repositories.ItemRepository;
 import com.takeitfree.itemmanagement.services.AzureBlobStorageService;
 import com.takeitfree.itemmanagement.services.GeocodingService;
 import com.takeitfree.itemmanagement.services.ItemService;
-import com.takeitfree.itemmanagement.services.UploadCareService;
 import com.takeitfree.itemmanagement.validators.ObjectValidator;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -30,7 +29,6 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final ObjectValidator objectValidator;
     private final GeocodingService geocodingService;
-    private final UploadCareService uploadCareService;
     private final AzureBlobStorageService azureBlobStorageService;
 
     @Override
@@ -38,26 +36,26 @@ public class ItemServiceImpl implements ItemService {
     public String addItem(ItemRequestDTO itemRequestDTO) {
 
         try {
-            // Validate input
+
+            // Process validation
             objectValidator.validate(itemRequestDTO);
             validateRequiredFields(itemRequestDTO);
 
-            // Process location
+            //process location
             LocationData locationData = geocodingService.getLocationFromPostalCode(itemRequestDTO.getPostalCode());
             updateItemWithLocation(itemRequestDTO, locationData);
 
-            // Process image
+            // Extract url of image from Azure
             String imageUrl = processItemImage(itemRequestDTO.getUrlImage());
 
-            // Create new Item with image's url
+            // process new entity with urlImage
             Item newItem = createItemEntity(itemRequestDTO, imageUrl);
 
-            // Save item
             itemRepository.save(newItem);
 
             return "Item added successfully";
+
         } catch (Exception e) {
-            //log.error("Error adding item: {}", e.getMessage(), e);
             throw new ItemProcessingException("Failed to add item: " + e.getMessage(), e);
         }
 
@@ -91,6 +89,7 @@ public class ItemServiceImpl implements ItemService {
     public String updateItem(ItemRequestDTO itemRequestDTO) {
         try {
             objectValidator.validate(itemRequestDTO);
+            validateRequiredFields(itemRequestDTO);
 
             Optional<Item> itemOptional = itemRepository.findById(itemRequestDTO.getId());
 
@@ -98,28 +97,19 @@ public class ItemServiceImpl implements ItemService {
                 throw new EntityNotFoundException("Item not found");
             }
 
-            // Si un code postal is provided, we update
-            if (itemRequestDTO.getPostalCode() == null || itemRequestDTO.getPostalCode().isEmpty()) {
-                throw new RuntimeException("Postal code is missing");
-            }
-
+            // Process update location
             LocationData locationData = geocodingService.getLocationFromPostalCode(itemRequestDTO.getPostalCode());
-            itemRequestDTO.setLatitude(locationData.getLatitude());
-            itemRequestDTO.setLongitude(locationData.getLongitude());
-            itemRequestDTO.setCity(locationData.getCity());
+            updateItemWithLocation(itemRequestDTO, locationData);
 
-            Item item = itemOptional.get();
-            String urlImage = uploadCareService.uploadFile(itemRequestDTO.getUrlImage());
+            // Process UrlImage
+            String urlImage = processItemImage(itemRequestDTO.getUrlImage());
+            Item updatedItem = createItemEntity(itemRequestDTO, urlImage);
 
-            // Mise à jour des champs
-            item.setTitle(itemRequestDTO.getTitle());
-            item.setImage(urlImage);
-            item.setStatus(StatusDTO.toEntity(StatusIdDTO.toDTO(itemRequestDTO.getStatusId())));
-            item.setLatitude(itemRequestDTO.getLatitude());
-            item.setLongitude(itemRequestDTO.getLongitude());
-            item.setCity(itemRequestDTO.getCity());
+            // Process title and status
+            updateTitleAndStatus(updatedItem, itemRequestDTO.getTitle(), itemRequestDTO.getStatusId());
 
-            itemRepository.save(item);
+            //save_update item
+            itemRepository.save(updatedItem);
 
             return "Item updated successfully";
         } catch (EntityExistsException e) {
@@ -195,7 +185,7 @@ public class ItemServiceImpl implements ItemService {
 
     private void validateRequiredFields(ItemRequestDTO itemRequestDTO) {
         // Validate postal code
-        if (StringUtils.isEmpty(itemRequestDTO.getPostalCode())) {
+        if (itemRequestDTO.getPostalCode() == null || StringUtils.isEmpty(itemRequestDTO.getPostalCode())) {
             throw new IllegalArgumentException("Postal code is required");
         }
 
@@ -226,7 +216,7 @@ public class ItemServiceImpl implements ItemService {
 
     private String processItemImage(MultipartFile imageUrl) throws IOException {
         try {
-            return uploadCareService.uploadFile(imageUrl);
+            return azureBlobStorageService.uploadFile(imageUrl);
         } catch (IOException e) {
             //log.error("Failed to upload image to Cloudinary", e);
             throw new ImageProcessingException("Failed to process image", e);
@@ -238,5 +228,12 @@ public class ItemServiceImpl implements ItemService {
         item.setImage(imageUrl);
         item.setTaken(false);
         return item;
+    }
+
+    private void updateTitleAndStatus(Item item, String title, StatusIdDTO statusIdDTO) {
+
+        item.setTitle(title);
+        item.setStatus(StatusDTO.toEntity(StatusIdDTO.toDTO(statusIdDTO)));
+
     }
 }
