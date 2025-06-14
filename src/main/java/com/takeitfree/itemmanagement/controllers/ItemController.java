@@ -2,21 +2,16 @@ package com.takeitfree.itemmanagement.controllers;
 
 import com.takeitfree.itemmanagement.dto.ItemPublicDTO;
 import com.takeitfree.itemmanagement.dto.ItemRequestDTO;
-import com.takeitfree.itemmanagement.dto.StatusDTO;
 import com.takeitfree.itemmanagement.dto.StatusIdDTO;
 import com.takeitfree.itemmanagement.services.ItemService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/item")
@@ -24,7 +19,6 @@ import java.util.stream.Collectors;
 public class ItemController {
 
     private final ItemService itemService;
-    private final Logger logger = LoggerFactory.getLogger(ItemController.class);
 
     @PostMapping("/add")
     public ResponseEntity<?> addItem(
@@ -80,12 +74,29 @@ public class ItemController {
         return ResponseEntity.ok(itemService.getItemsByTaken(taken));
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<?> updateItem(@RequestBody @Valid ItemRequestDTO itemRequestDTO, BindingResult result) {
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body(formatValidationErrors(result));
+    @PostMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateItem(@RequestParam Long id,
+                                        @RequestParam("title") String title,
+                                        @RequestParam("postalCode") String postalCode,
+                                        @RequestParam("statusId") Long statusId,
+                                        @RequestParam("image") MultipartFile imageFile) {
+
+        try {
+            StatusIdDTO statusDTO = StatusIdDTO.builder().id(statusId).build();
+
+            ItemRequestDTO itemRequestDTO = ItemRequestDTO.builder()
+                    .id(id)
+                    .title(title)
+                    .postalCode(postalCode)
+                    .statusId(statusDTO)
+                    .urlImage(imageFile)
+                    .build();
+
+            return ResponseEntity.ok(itemService.updateItem(itemRequestDTO));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error during updating item: " + e.getMessage()+" "+e.getCause());
         }
-        return ResponseEntity.ok(itemService.updateItem(itemRequestDTO));
     }
 
     @DeleteMapping("/delete/{id}")
@@ -96,12 +107,5 @@ public class ItemController {
     @PutMapping("/take/{id}")
     public ResponseEntity<Boolean> markItemAsTaken(@PathVariable Long id) {
         return ResponseEntity.ok(itemService.markItemAsTaken(id));
-    }
-
-    private List<String> formatValidationErrors(BindingResult result) {
-        return result.getFieldErrors()
-                .stream()
-                .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                .collect(Collectors.toList());
     }
 }
