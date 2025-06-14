@@ -1,10 +1,12 @@
 package com.takeitfree.itemmanagement.dto;
 
 import com.takeitfree.itemmanagement.models.Item;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
 import java.util.List;
@@ -21,11 +23,9 @@ public class ItemRequestDTO implements Serializable {
     @Size(min = 2, max = 100, message = "Title must be between 2 and 100 characters")
     private String title;
 
-    @NotBlank(message = "Image is required")
-    @Size(max = 300, message = "image path too long")
-    private String image;
+    @Setter
+    private MultipartFile urlImage;
 
-    @NotNull(message = "Status is required")
     private StatusIdDTO statusId;
 
     @NotBlank(message = "postalCode is required")
@@ -46,7 +46,7 @@ public class ItemRequestDTO implements Serializable {
         return ItemRequestDTO.builder()
                 .id(item.getId())
                 .title(item.getTitle())
-                .image(item.getImage())
+                // urlImage is intentionally omitted here since we can't convert String back to MultipartFile
                 .statusId(StatusIdDTO.toIdDTO(
                         StatusDTO.toDTO(item.getStatus())
                 ))
@@ -61,7 +61,6 @@ public class ItemRequestDTO implements Serializable {
         return Item.builder()
                 .id(item.getId())
                 .title(item.getTitle())
-                .image(item.getImage())
                 .status(StatusDTO.toEntity(
                         StatusIdDTO.toDTO(item.statusId)
                 ))
