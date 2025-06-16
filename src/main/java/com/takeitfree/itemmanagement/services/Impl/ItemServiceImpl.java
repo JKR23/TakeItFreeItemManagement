@@ -62,26 +62,26 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemRequestDTO> getAllItems() {
-        return ItemRequestDTO.toDTO(itemRepository.findAll());
+    public List<ItemPublicDTO> getAllItems() {
+        return ItemPublicDTO.toDTO(itemRepository.findAll());
     }
 
     @Override
-    public List<ItemRequestDTO> getItemsByTitle(String title) {
+    public List<ItemPublicDTO> getItemsByTitle(String title) {
         objectValidator.validate(title);
-        return ItemRequestDTO.toDTO(itemRepository.findByTitleContainingIgnoreCase(title));
+        return ItemPublicDTO.toDTO(itemRepository.findByTitleContainingIgnoreCase(title));
     }
 
     @Override
-    public List<ItemRequestDTO> getItemsByPostalCode(String postalCode) {
+    public List<ItemPublicDTO> getItemsByPostalCode(String postalCode) {
         objectValidator.validate(postalCode);
-        return ItemRequestDTO.toDTO(itemRepository.findByPostalCode(postalCode));
+        return ItemPublicDTO.toDTO(itemRepository.findByPostalCode(postalCode));
     }
 
     @Override
-    public List<ItemRequestDTO> getItemsByTaken(boolean taken) {
+    public List<ItemPublicDTO> getItemsByTaken(boolean taken) {
         objectValidator.validate(taken);
-        return ItemRequestDTO.toDTO(itemRepository.findByTaken(taken));
+        return ItemPublicDTO.toDTO(itemRepository.findByTaken(taken));
     }
 
     @Override
