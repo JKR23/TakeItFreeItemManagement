@@ -13,8 +13,8 @@ public interface StatusService {
     String updateStatus(StatusDTO status);
     String deleteStatus(Long id);
 
-    List<ItemRequestDTO> getItemsByStatusName(String name);
+    List<ItemPublicDTO> getItemsByStatusName(String name);
 
-    List<ItemRequestDTO> getItemsByStatusId(Long id);
+    List<ItemPublicDTO> getItemsByStatusId(Long id);
     List<ItemPublicDTO> getAllStatusItems();
 }

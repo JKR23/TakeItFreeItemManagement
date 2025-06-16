@@ -50,17 +50,17 @@ public class ItemController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<ItemRequestDTO>> getAllItems() {
+    public ResponseEntity<List<ItemPublicDTO>> getAllItems() {
         return ResponseEntity.ok(itemService.getAllItems());
     }
 
     @GetMapping("/by-title")
-    public ResponseEntity<List<ItemRequestDTO>> getItemsByTitle(@RequestParam String title) {
+    public ResponseEntity<List<ItemPublicDTO>> getItemsByTitle(@RequestParam String title) {
         return ResponseEntity.ok(itemService.getItemsByTitle(title));
     }
 
     @GetMapping("/by-location")
-    public ResponseEntity<List<ItemRequestDTO>> getItemsByLocation(@RequestParam String location) {
+    public ResponseEntity<List<ItemPublicDTO>> getItemsByLocation(@RequestParam String location) {
         return ResponseEntity.ok(itemService.getItemsByPostalCode(location));
     }
 
@@ -70,11 +70,11 @@ public class ItemController {
     }
 
     @GetMapping("/by-taken")
-    public ResponseEntity<List<ItemRequestDTO>> getItemsByTaken(@RequestParam boolean taken) {
+    public ResponseEntity<List<ItemPublicDTO>> getItemsByTaken(@RequestParam boolean taken) {
         return ResponseEntity.ok(itemService.getItemsByTaken(taken));
     }
 
-    @PostMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateItem(@RequestParam Long id,
                                         @RequestParam("title") String title,
                                         @RequestParam("postalCode") String postalCode,

@@ -9,13 +9,13 @@ public interface ItemService {
 
     String addItem(ItemRequestDTO itemRequestDTO);
 
-    List<ItemRequestDTO> getAllItems();
+    List<ItemPublicDTO> getAllItems();
 
-    List<ItemRequestDTO> getItemsByTitle(String title);
+    List<ItemPublicDTO> getItemsByTitle(String title);
 
-    List<ItemRequestDTO> getItemsByPostalCode(String postalCode);
+    List<ItemPublicDTO> getItemsByPostalCode(String postalCode);
 
-    List<ItemRequestDTO> getItemsByTaken(boolean taken);
+    List<ItemPublicDTO> getItemsByTaken(boolean taken);
 
     String updateItem(ItemRequestDTO itemRequestDTO);
 
