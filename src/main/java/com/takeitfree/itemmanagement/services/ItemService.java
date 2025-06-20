@@ -11,6 +11,8 @@ public interface ItemService {
 
     List<ItemPublicDTO> getAllItems();
 
+    List<ItemPublicDTO> getMyAllItems();
+
     List<ItemPublicDTO> getItemsByTitle(String title);
 
     List<ItemPublicDTO> getItemsByPostalCode(String postalCode);
