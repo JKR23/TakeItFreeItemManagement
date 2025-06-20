@@ -1,8 +1,10 @@
 package com.takeitfree.itemmanagement.services.Impl;
 
+import com.takeitfree.itemmanagement.config.utils.SecurityUtils;
 import com.takeitfree.itemmanagement.dto.*;
 import com.takeitfree.itemmanagement.exceptions.ImageProcessingException;
 import com.takeitfree.itemmanagement.exceptions.ItemProcessingException;
+import com.takeitfree.itemmanagement.exceptions.UserNotConnectedException;
 import com.takeitfree.itemmanagement.models.Item;
 import com.takeitfree.itemmanagement.repositories.ItemRepository;
 import com.takeitfree.itemmanagement.services.AzureBlobStorageService;
@@ -19,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -37,6 +40,8 @@ public class ItemServiceImpl implements ItemService {
 
         try {
 
+            Long idCurrentUser = SecurityUtils.getCurrentUserId();
+
             // Process validation
             objectValidator.validate(itemRequestDTO);
             validateRequiredFields(itemRequestDTO);
@@ -51,6 +56,12 @@ public class ItemServiceImpl implements ItemService {
             // process new entity with urlImage
             Item newItem = createItemEntity(itemRequestDTO, imageUrl);
 
+            newItem.setUserIdPublisher(idCurrentUser);
+
+            if (newItem.getUserIdPublisher() == null) {
+                throw new UserNotConnectedException("User not connected");
+            }
+
             itemRepository.save(newItem);
 
             return "Item added successfully";
@@ -64,6 +75,18 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemPublicDTO> getAllItems() {
         return ItemPublicDTO.toDTO(itemRepository.findAll());
+    }
+
+    @Override
+    public List<ItemPublicDTO> getMyAllItems() {
+
+        Long idUser = SecurityUtils.getCurrentUserId();
+
+        return ItemPublicDTO.toDTO(
+                itemRepository.findAll().stream()
+                    .filter(item -> Objects.equals(item.getUserIdPublisher(), idUser))
+                    .toList()
+        );
     }
 
     @Override
@@ -88,6 +111,10 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public String updateItem(ItemRequestDTO itemRequestDTO) {
         try {
+
+            //extract idUser from frontend request
+            Long idCurrentUser = SecurityUtils.getCurrentUserId();
+
             objectValidator.validate(itemRequestDTO);
             validateRequiredFields(itemRequestDTO);
 
@@ -104,6 +131,8 @@ public class ItemServiceImpl implements ItemService {
             // Process UrlImage
             String urlImage = processItemImage(itemRequestDTO.getUrlImage());
             Item updatedItem = createItemEntity(itemRequestDTO, urlImage);
+
+            updatedItem.setUserIdPublisher(idCurrentUser);
 
             // Process title and status
             updateTitleAndStatus(updatedItem, itemRequestDTO.getTitle(), itemRequestDTO.getStatusId());

@@ -68,4 +68,15 @@ public class GlobalExceptionHandler {
                                 .build()
                 );
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<RepresentationException> handleIllegalStateException(IllegalStateException e) {
+        return ResponseEntity
+                .status(HttpStatusCode.valueOf(400))
+                .body(
+                        RepresentationException.builder()
+                                .errorMessage(e.getMessage()+"\n"+e.getCause().toString()+"\n"+ Arrays.toString(e.getStackTrace()))
+                                .build()
+                );
+    }
 }

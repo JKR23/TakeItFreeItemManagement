@@ -2,6 +2,7 @@ package com.takeitfree.itemmanagement.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -42,5 +43,7 @@ public class Item implements Serializable {
     private String city;
 
     private boolean taken;
+
+    private Long userIdPublisher;
 
 }

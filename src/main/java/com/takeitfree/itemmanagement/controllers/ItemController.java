@@ -20,8 +20,8 @@ public class ItemController {
 
     private final ItemService itemService;
 
-    @PostMapping("/add")
-    public ResponseEntity<?> addItem(
+    @PostMapping("/publisher-items")
+    public ResponseEntity<?> publishItem(
             @RequestParam("title") String title,
             @RequestParam("postalCode") String postalCode,
             @RequestParam("statusId") Long statusId,
@@ -52,6 +52,11 @@ public class ItemController {
     @GetMapping("/all")
     public ResponseEntity<List<ItemPublicDTO>> getAllItems() {
         return ResponseEntity.ok(itemService.getAllItems());
+    }
+
+    @GetMapping("/my-items")
+    public ResponseEntity<List<ItemPublicDTO>> getMyAllItems() {
+        return ResponseEntity.ok(itemService.getMyAllItems());
     }
 
     @GetMapping("/by-title")
@@ -99,12 +104,8 @@ public class ItemController {
         }
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteItem(@PathVariable Long id) {
-        return ResponseEntity.ok(itemService.deleteItem(id));
-    }
 
-    @PutMapping("/take/{id}")
+    @PutMapping("/marked-taken/{id}")
     public ResponseEntity<Boolean> markItemAsTaken(@PathVariable Long id) {
         return ResponseEntity.ok(itemService.markItemAsTaken(id));
     }
