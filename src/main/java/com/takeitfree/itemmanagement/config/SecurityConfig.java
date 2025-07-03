@@ -51,7 +51,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000")); // Allows frontend on port 3000
+        config.setAllowedOrigins(List.of(
+                "http://localhost:3001",
+                "https://take-it-free-item-management-fronte.vercel.app"
+        )); // Allows frontend on port 3000
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Allowed HTTP methods
         config.setAllowedHeaders(List.of("*")); // Allows any headers
         config.setAllowCredentials(true); // Allow cookies or Authorization headers
