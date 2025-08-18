@@ -11,6 +11,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Implementation of AzureBlobStorageService for uploading files to Azure Blob Storage.
+ */
 @Service
 public class AzureBlobStorageServiceImpl implements AzureBlobStorageService {
 
@@ -20,6 +23,13 @@ public class AzureBlobStorageServiceImpl implements AzureBlobStorageService {
     @Value("${azure.storage.container-name}")
     private String containerName;
 
+    /**
+     * Uploads a file to Azure Blob Storage.
+     *
+     * @param file the file to upload
+     * @return the URL of the uploaded file
+     * @throws IOException if an error occurs during file upload
+     */
     @Override
     public String uploadFile(MultipartFile file) throws IOException {
 

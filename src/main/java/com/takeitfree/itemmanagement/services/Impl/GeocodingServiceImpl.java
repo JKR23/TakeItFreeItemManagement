@@ -18,8 +18,16 @@ public class GeocodingServiceImpl implements GeocodingService {
     @Value("${locationiq.api.key}")
     private String locationIqApiKey;
 
+    // Used to make REST calls to external services
     private final RestTemplate restTemplate = new RestTemplate();
 
+    /**
+     * Retrieves location data based on a postal code using the LocationIQ API.
+     *
+     * @param postalCode the postal code to search for
+     * @return LocationData containing latitude, longitude, and city name
+     * @throws RuntimeException if the postal code is null, empty, or no results are found
+     */
     @Override
     public LocationData getLocationFromPostalCode(String postalCode) {
         if (postalCode == null || postalCode.trim().isEmpty()) {

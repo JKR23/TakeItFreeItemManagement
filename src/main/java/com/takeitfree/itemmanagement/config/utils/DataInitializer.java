@@ -6,6 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class initializes default data in the database upon application startup.
+ * It implements CommandLineRunner to execute the run method after the application context is loaded.
+ */
 @Component
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
