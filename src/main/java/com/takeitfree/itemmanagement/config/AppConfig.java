@@ -7,6 +7,7 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class AppConfig {
 
+    //used to make REST calls to external services
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();

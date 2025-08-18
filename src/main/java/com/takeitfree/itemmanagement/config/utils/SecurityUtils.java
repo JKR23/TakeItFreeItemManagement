@@ -9,7 +9,6 @@ public class SecurityUtils {
     /**
      * Utility method to retrieve the ID of the currently authenticated user
      * based on the JWT token stored in the Spring Security context.
-     *
      * @return the user ID from the "userId" claim in the JWT
      * @throws IllegalStateException if the user is not authenticated via JWT or if the ID is missing
      */
