@@ -10,6 +10,7 @@ import com.takeitfree.itemmanagement.repositories.ItemRepository;
 import com.takeitfree.itemmanagement.services.AzureBlobStorageService;
 import com.takeitfree.itemmanagement.services.GeocodingService;
 import com.takeitfree.itemmanagement.services.ItemService;
+import com.takeitfree.itemmanagement.services.NotificationPublisher;
 import com.takeitfree.itemmanagement.validators.ObjectValidator;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -33,6 +34,7 @@ public class ItemServiceImpl implements ItemService {
     private final ObjectValidator objectValidator;
     private final GeocodingService geocodingService;
     private final AzureBlobStorageService azureBlobStorageService;
+    private final NotificationPublisher notificationPublisher;
 
     @Override
     @Transactional
@@ -63,6 +65,9 @@ public class ItemServiceImpl implements ItemService {
             }
 
             itemRepository.save(newItem);
+
+            // Publish notification on RabbitMQ
+            notificationPublisher.publishNewItem("new item added! : " + newItem.getTitle());
 
             return "Item added successfully";
 
