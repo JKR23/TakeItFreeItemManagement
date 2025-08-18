@@ -17,6 +17,12 @@ import java.util.stream.Collectors;
 public class StatusController {
     private final StatusService statusService;
 
+    // GET /status/all
+    @GetMapping("/all")
+    public ResponseEntity<List<StatusDTO>> getAllStatus() {
+        return ResponseEntity.ok(statusService.getAllStatus());
+    }
+
     // GET /status/items?name=Active
     @GetMapping("/items")
     public ResponseEntity<List<ItemPublicDTO>> getItemsByStatusName(@RequestParam String name) {
@@ -35,12 +41,6 @@ public class StatusController {
     @GetMapping("/items-all")
     public ResponseEntity<List<ItemPublicDTO>> getAllStatusItemsNotTaken() {
         return ResponseEntity.ok(statusService.getAllStatusItems());
-    }
-
-    // GET /status/all
-    @GetMapping("/all")
-    public ResponseEntity<List<StatusDTO>> getAllStatus() {
-        return ResponseEntity.ok(statusService.getAllStatus());
     }
 
     // GET /status/by-name?name=Active

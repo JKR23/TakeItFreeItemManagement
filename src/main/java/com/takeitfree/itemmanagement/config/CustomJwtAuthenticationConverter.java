@@ -38,6 +38,12 @@ public class CustomJwtAuthenticationConverter implements Converter<Jwt, Abstract
     }
 
     // Convert the JWT into an Authentication token using the customized converter
+    /**
+     * Converts a JWT into an AbstractAuthenticationToken.
+     *
+     * @param jwt the JWT to convert
+     * @return an AbstractAuthenticationToken containing the authorities from the JWT
+     */
     @Override
     public AbstractAuthenticationToken convert(Jwt jwt) {
         System.out.println("JWT Claims: " + jwt.getClaims());

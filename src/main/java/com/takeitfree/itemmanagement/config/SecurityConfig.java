@@ -28,6 +28,14 @@ public class SecurityConfig {
     @Value("${spring.security.oauth2.resourceserver.jwt.secret-key}")
     private String secretKey;
 
+    /**
+     * Configures the security filter chain for the application.
+     * This method sets up CORS, CSRF, and OAuth2 resource server configurations.
+     *
+     * @param http the HttpSecurity object to configure
+     * @return the configured SecurityFilterChain
+     * @throws Exception if an error occurs during configuration
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -48,6 +56,12 @@ public class SecurityConfig {
                 .build();
     }
 
+    /**
+     * Configures CORS settings for the application.
+     * This method allows specific origins, methods, and headers for cross-origin requests.
+     *
+     * @return the configured CorsConfigurationSource
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
@@ -66,6 +80,12 @@ public class SecurityConfig {
         return source;
     }
 
+    /**
+     * Configures the JWT decoder for the OAuth2 resource server.
+     * This method uses a secret key to decode JWT tokens.
+     *
+     * @return the configured JwtDecoder
+     */
     @Bean
     public JwtDecoder jwtDecoder() {
         byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
